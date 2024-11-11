@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Guessing Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* General Reset and Styling */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* Navigation Styling */
+        nav {
+            background-color: #333;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        nav a {
+            color: #FFD700;
+            text-decoration: none;
+            font-size: 1.2em;
+            margin: 0 15px;
+        }
+        nav a:hover {
+            color: #FFA500;
+        }
+
+        /* Main Content Styling */
+        main {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+        p {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        /* Game Section Styling */
+        #game {
+            margin-top: 20px;
+        }
+        #game label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            color: #444;
+        }
+        #guess {
+            width: 80%;
+            padding: 10px;
+            font-size: 1em;
+            margin-bottom: 10px;
+            border: 2px solid #4CAF50;
+            border-radius: 5px;
+            outline: none;
+        }
+        #submit {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #submit:hover {
+            background-color: #45a049;
+        }
+
+        /* Score and Lives Styling */
+        #score, #lives, #anime-description, #high-score {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-top: 15px;
+            color: #222;
+        }
+
+        /* Footer Styling */
+        footer {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Welcome to the Anime Guessing Game!</h1>
+        <p>Test your anime knowledge by guessing the title from its description.</p>
+
+        <div id="anime-description">Loading description...</div>
+
+        <div id="game">
+            <label for="guess">Guess the anime title:</label>
+            <input type="text" id="guess" name="guess" required>
+            <button id="submit">Submit</button>
+        </div>
+
+        <div id="score">Your current score: 0</div>
+        <div id="high-score">Your highest score: 0</div>
+        <div id="lives">Lives: 3</div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Anime Guess It. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const animeList = [
+        { title: "Naruto", description: "A young ninja named Naruto Uzumaki seeks recognition and dreams of becoming the Hokage, the leader of his village." },
+        { title: "One Piece", description: "Follow Monkey D. Luffy and his pirate crew in their quest to find the One Piece, the greatest treasure in the world." },
+        { title: "Attack on Titan", description: "Humanity fights for survival against gigantic humanoid creatures known as Titans, who devour humans." },
+        { title: "My Hero Academia", description: "In a world where people with superpowers are the norm, Izuku Midoriya dreams of becoming a hero despite being born without powers." },
+        { title: "Death Note", description: "A high school student discovers a notebook that allows him to kill anyone whose name he writes in it, leading to a battle of wits with a genius detective." },
+        { title: "Demon Slayer", description: "Tanjiro Kamado becomes a demon slayer to avenge his family and cure his sister Nezuko, who has been turned into a demon." },
+        { title: "Dragon Ball Z", description: "Goku and his friends defend Earth against powerful foes, seeking the Dragon Balls that can grant wishes." },
+        { title: "Sword Art Online", description: "Players of a virtual reality MMORPG find themselves trapped in the game, where death in the game means death in real life." },
+        { title: "Pokémon", description: "Ash Ketchum travels the world to become a Pokémon Master, catching and training Pokémon along the way with Pikachu." },
+        { title: "Fullmetal Alchemist", description: "Two brothers search for the Philosopher's Stone after a disastrous alchemical experiment leaves them physically damaged." },
+        { title: "Tokyo Ghoul", description: "A young man becomes half-ghoul after an encounter with one, struggling to balance his new life and hunger." },
+        { title: "Bleach", description: "Ichigo Kurosaki gains the power of a Soul Reaper and must protect humanity from evil spirits and guided souls." },
+        { title: "Fairy Tail", description: "Lucy Heartfilia joins the Fairy Tail guild, where she goes on adventures with fellow wizards to protect the land." },
+        { title: "Hunter x Hunter", description: "Gon Freecss becomes a Hunter to find his father and experiences life-changing adventures." },
+        { title: "Neon Genesis Evangelion", description: "Young pilots operate giant mechs to protect humanity from mysterious beings known as Angels." },
+        { title: "Steins;Gate", description: "A self-proclaimed mad scientist discovers time travel and faces unintended consequences in a conspiracy-laden world." },
+        { title: "Cowboy Bebop", description: "A group of bounty hunters travel through space on adventures, exploring existential themes along the way." },
+        { title: "InuYasha", description: "A modern-day girl travels to the past and partners with a half-demon to collect pieces of a powerful jewel." },
+        { title: "Code Geass", description: "A young prince gains the power to command others and leads a rebellion against a tyrannical empire." },
+        { title: "Yu Yu Hakusho", description: "A teenage delinquent becomes a spirit detective, fighting demons and saving the world." },
+        { title: "Fate/Stay Night", description: "Mages summon historical figures to fight in a battle for the Holy Grail, a wish-granting artifact." },
+        { title: "Mob Psycho 100", description: "A young psychic battles supernatural beings while struggling with his own emotions and powers." },
+        { title: "Black Clover", description: "Asta, a young boy without magical powers, strives to become the Wizard King in a world filled with magic." },
+        { title: "Trigun", description: "Vash the Stampede is a wanted gunslinger with a mysterious past, fighting for peace on a desert planet." },
+        { title: "The Rising of the Shield Hero", description: "A young man is summoned to a fantasy world as a hero, facing betrayal and overcoming adversity." },
+        { title: "Kaguya-sama: Love is War", description: "Two high school geniuses try to make each other confess love first in a battle of wits." },
+        { title: "Dr. Stone", description: "A boy genius works to revive civilization after humanity is petrified for thousands of years." },
+        { title: "Samurai Champloo", description: "Two samurais and a waitress search for a mysterious samurai in a unique blend of action and hip-hop culture." },
+        { title: "The Seven Deadly Sins", description: "A princess seeks out legendary knights to save her kingdom from corrupt Holy Knights." },
+        { title: "JoJo's Bizarre Adventure", description: "Multiple generations of the Joestar family battle against evil forces with supernatural powers." },
+        { title: "Re:Zero", description: "A young man is transported to a fantasy world where he dies repeatedly, only to restart from his last checkpoint." },
+        { title: "One Punch Man", description: "A hero who can defeat any foe with one punch searches for a worthy opponent and deals with existential boredom." },
+        { title: "Noragami", description: "A minor god tries to gain followers by performing odd jobs and encounters spirits and other gods." },
+        { title: "Your Lie in April", description: "A young pianist rediscovers his passion for music after meeting a talented violinist." },
+        { title: "Clannad", description: "A delinquent meets a girl and is gradually drawn into her world and her struggles, leading to profound changes." },
+        { title: "Elfen Lied", description: "A young girl with dangerous telekinetic powers escapes from a lab and struggles with her violent nature." },
+        { title: "Violet Evergarden", description: "A former soldier works as a letter writer, helping others express their feelings and finding her own humanity." },
+        { title: "Blue Exorcist", description: "The son of Satan decides to become an exorcist and fights against demons to protect the world." },
+        { title: "Parasyte", description: "A high school boy merges with an alien parasite and must fight to survive against other hostile parasites." },
+        { title: "Made in Abyss", description: "A young girl and a robot descend into a mysterious and dangerous chasm filled with powerful artifacts." },
+        { title: "Bakuman", description: "Two high school students team up to become successful manga artists in the competitive industry." },
+        { title: "Akame ga Kill!", description: "A young man joins a group of assassins fighting against a corrupt empire." },
+        { title: "Erased", description: "A man is sent back in time to prevent the murder of his childhood friend and uncover a serial killer." },
+        { title: "Kill la Kill", description: "A girl searches for her father's killer, armed with a powerful, sentient school uniform." },
+        { title: "Angel Beats!", description: "Students trapped in the afterlife band together to fight against a mysterious figure and find peace." },
+        { title: "Assassination Classroom", description: "A class of misfits is tasked with assassinating their alien teacher, who will destroy Earth if they fail." },
+        { title: "Hellsing", description: "An organization fights vampires and other supernatural forces, led by the powerful vampire Alucard." },
+        { title: "Monster", description: "A doctor saves a boy's life, only to later find himself pursued by the boy, who has become a serial killer." },
+        { title: "Berserk", description: "A lone warrior with a cursed brand fights against dark forces in a brutal medieval world." },
+        { title: "Toradora!", description: "A high school romance blooms between two unlikely students, who help each other win over their crushes." },
+    ];
+
+        let lives = 3;
+        let score = 0;
+        let currentAnimeTitle = '';
+        let guessedTitles = [];
+
+        let highScore = localStorage.getItem('highScore') ? parseInt(localStorage.getItem('highScore')) : 0;
+        document.getElementById('high-score').innerText = "Your highest score: " + highScore;
+
+        function fetchRandomAnime() {
+            if (guessedTitles.length >= animeList.length) {
+                alert("You've guessed all available anime titles!");
+                return;
+            }
+
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * animeList.length);
+            } while (guessedTitles.includes(animeList[randomIndex].title));
+
+            const selectedAnime = animeList[randomIndex];
+            currentAnimeTitle = selectedAnime.title;
+            document.getElementById('anime-description').innerText = `Description: ${selectedAnime.description}`;
+            document.getElementById('lives').innerText = "Lives: " + lives;
+        }
+
+        document.getElementById('submit').onclick = function() {
+            const userGuess = document.getElementById('guess').value;
+
+            if (userGuess.toLowerCase() === currentAnimeTitle.toLowerCase()) {
+                score++;
+                guessedTitles.push(currentAnimeTitle);
+                alert("Correct! Your score: " + score);
+                document.getElementById('score').innerText = "Your current score: " + score;
+
+                if (score > highScore) {
+                    highScore = score;
+                    localStorage.setItem('highScore', highScore);
+                    document.getElementById('high-score').innerText = "Your highest score: " + highScore;
+                }
+
+                fetchRandomAnime();
+            } else {
+                lives--;
+                alert("Incorrect! You have " + lives + " lives left.");
+                document.getElementById('lives').innerText = "Lives: " + lives;
+
+                if (lives === 0) {
+                    alert("Game Over! Your final score: " + score);
+                    lives = 3;
+                    score = 0;
+                    guessedTitles = [];
+                    document.getElementById('score').innerText = "Your current score: " + score;
+                    fetchRandomAnime();
+                }
+            }
+
+            document.getElementById('guess').value = '';
+        };
+
+        fetchRandomAnime();
+    </script>
+</body>
+</html>
